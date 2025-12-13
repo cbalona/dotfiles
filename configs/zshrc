@@ -1,0 +1,44 @@
+# PATHS & ENV
+export EDITOR='code --wait'
+export PATH="$HOME/.cargo/bin:$PATH"
+
+# BAT
+if command -v batcat > /dev/null; then
+  alias bat='batcat'
+fi
+alias cat='bat --style=plain'
+
+# NALA
+alias apt='sudo nala'
+alias install='sudo nala install'
+alias update='sudo nala update && sudo nala upgrade'
+
+# EZA
+alias ls='eza --icons --git --group-directories-first'
+alias ll='eza -al --icons --git --group-directories-first'
+alias lt='eza -alT --icons --git-ignore --level=2'
+
+# ZOXIDE
+alias cd='z'
+eval "$(zoxide init zsh)"
+
+# FZF
+source <(fzf --zsh)
+
+# PROMPT
+autoload -Uz vcs_info
+precmd() { vcs_info }
+
+zstyle ':vcs_info:git:*' formats '(%b)'
+setopt prompt_subst
+PROMPT='%F{cyan}%~%f %F{yellow}${vcs_info_msg_0_}%f
+%F{green}❯%f '
+
+# PLUGINS
+if [ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+    source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
+
+if [ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+    source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi

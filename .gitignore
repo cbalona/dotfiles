@@ -1,0 +1,6 @@
+.DS_Store
+*.retry
+*.log
+.idea/
+.vscode/
+ansible/secrets.yml

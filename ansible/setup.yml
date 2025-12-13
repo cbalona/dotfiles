@@ -1,0 +1,76 @@
+---
+- hosts: localhost
+  connection: local
+  become: true # Run as root for packages
+  vars:
+    user_home: "{{ lookup('env', 'HOME') }}"
+    username: "{{ lookup('env', 'USER') }}"
+
+  tasks:
+    # --- System Packages ---
+    - name: Update Apt Cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install Essential Tools
+      apt:
+        name:
+          - bat
+          - build-essential
+          - curl
+          - eza
+          - fzf
+          - git
+          - htop
+          - nala
+          - neovim
+          - ripgrep
+          - unzip
+          - wget
+          - zoxide
+          - zsh
+          - zsh-autosuggestions
+          - zsh-syntax-highlighting
+        state: present
+        update-cache: yes
+
+    # --- Install 'uv' ---
+    - name: Install uv
+      shell: curl -LsSf https://astral.sh/uv/install.sh | sh
+      args:
+        creates: "{{ user_home }}/.cargo/bin/uv"
+      become: false
+
+    # --- Install Starship ---
+    - name: Install Starship
+      shell: curl -sS https://starship.rs/install.sh | sh -s -- -y
+      args:
+        creates: /usr/local/bin/starship
+
+    # --- Dotfiles Linking ---
+    - name: Configure WSL Specific Git Settings
+      copy:
+        dest: "{{ user_home }}/.gitconfig.wsl"
+        content: |
+          [credential]
+              helper = /mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe
+          [core]
+              filemode = true
+              
+    - name: Link Configs
+      file:
+        src: "{{ playbook_dir }}/../configs/{{ item.src }}"
+        dest: "{{ user_home }}/.{{ item.dest }}"
+        state: link
+        force: yes
+      loop:
+        - { src: 'zshrc', dest: 'zshrc' }
+        - { src: 'gitconfig', dest: 'gitconfig' }
+      become: false
+      
+    # --- 5. Shell Change ---
+    - name: Ensure User Shell is Zsh
+      user:
+        name: "{{ username }}"
+        shell: /bin/zsh

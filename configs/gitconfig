@@ -1,0 +1,38 @@
+[user]
+    name = Caesar Balona
+    email = caesar.balona@gmail.com
+
+[core]
+    editor = code --wait
+    autocrlf = input
+    safecrlf = warn
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = true  
+
+[diff]
+    tool = vscode
+
+[difftool "vscode"]
+    cmd = code --wait --diff $LOCAL $REMOTE
+
+[merge]
+    tool = vscode
+
+[mergetool "vscode"]
+    cmd = code --wait $MERGED
+
+[color]
+    ui = true
+
+[push]
+    autoSetupRemote = true
+
+[credential]
+    helper = manager
+
+[includeIf "gitdir:/mnt/"]
+    path = ~/.gitconfig.wsl
