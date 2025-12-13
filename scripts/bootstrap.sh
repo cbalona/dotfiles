@@ -16,16 +16,6 @@ if ! command -v ansible-playbook &> /dev/null; then
     sudo apt install -y ansible build-essential curl unzip
 fi
 
-# Install Bitwarden CLI
-if ! command -v bw &> /dev/null; then
-    echo ">>> Installing Bitwarden CLI..."
-    curl -L "https://vault.bitwarden.com/download/?app=cli&platform=linux" -o bw.zip
-    unzip bw.zip
-    chmod +x bw
-    sudo mv bw /usr/local/bin/
-    rm bw.zip
-fi
-
 # Run
 echo ">>> Applying Configuration..."
 cd ~/dotfiles/ansible

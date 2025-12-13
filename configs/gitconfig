@@ -31,8 +31,5 @@
 [push]
     autoSetupRemote = true
 
-[credential]
-    helper = manager
-
-[includeIf "gitdir:/mnt/"]
-    path = ~/.gitconfig.wsl
+[include]
+    path = ~/.gitconfig.local

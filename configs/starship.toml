@@ -1,0 +1,15 @@
+[character]
+success_symbol = "[>](green)"
+error_symbol = "[>](red)"
+
+[git_branch]
+symbol = "🌱 "
+truncation_length = 10
+truncation_symbol = ""
+ignore_branches = ["master", "main"]
+
+[git_status]
+style = "red"
+
+[package]
+disabled = true

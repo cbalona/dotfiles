@@ -27,6 +27,7 @@ tasks:
       
       # Create Link
       - powershell -Command "New-Item -ItemType SymbolicLink -Path '{{.USER_HOME}}\.gitconfig' -Target '{{.REPO_CONFIG}}'"
+      - powershell -Command "Set-Content -Path '{{.USER_HOME}}\.gitconfig.local' -Value '[credential]`r`n    helper = manager'"
       
       - echo "Windows Git Config Linked."
 
@@ -41,6 +42,8 @@ tasks:
       - mkdir {{.WSL_DRIVE_PATH}}
       - mkdir {{.BACKUP_PATH}}
       - wsl --export {{.WSL_DISTRO}} {{.BACKUP_PATH}}/temp_distro.tar
+      # Verify export size
+      - powershell -Command "if ((Get-Item '{{.BACKUP_PATH}}/temp_distro.tar').Length -lt 1000000) { Write-Error 'Export failed/too small'; exit 1 }"
       - wsl --unregister {{.WSL_DISTRO}}
       - wsl --import {{.WSL_DISTRO}} {{.WSL_DRIVE_PATH}}/{{.WSL_DISTRO}} {{.BACKUP_PATH}}/temp_distro.tar
       - echo "WSL Moved successfully."

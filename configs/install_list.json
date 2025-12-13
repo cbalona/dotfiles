@@ -35,6 +35,9 @@
 					"PackageIdentifier": "Microsoft.WindowsTerminal"
 				},
 				{
+					"PackageIdentifier": "DEVCOM.JetBrainsMonoNerdFont"
+				},
+				{
 					"PackageIdentifier": "Task.Task"
 				}
 			],
