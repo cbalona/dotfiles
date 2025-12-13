@@ -5,7 +5,7 @@ vars:
   WSL_USER: cb
   WSL_DRIVE_PATH: "E:/wsl"
   BACKUP_PATH: "E:/backups"
-  REPO_URL: "git@github.com:cbalona/dotfiles.git"
+  REPO_URL: "https://github.com/cbalona/dotfiles.git"
 
 tasks:
   default:
@@ -13,7 +13,7 @@ tasks:
     cmds:
       - task: setup-windows-git
       - task: wsl-move-drive
-      # - task: wsl-configure
+      - task: wsl-configure
 
   setup-windows-git:
     desc: "Links Windows Git config to the dotfiles repo"
@@ -51,7 +51,9 @@ tasks:
 
   wsl-configure:
     desc: "Bootstraps Linux and runs Ansible"
+    status:
+      - wsl -d {{.WSL_DISTRO}} bash -c "if [ -d ~/dotfiles ]; then exit 0; else exit 1; fi"
     cmds:
       - wsl -d {{.WSL_DISTRO}} bash -c "command -v git >/dev/null || (sudo apt update && sudo apt install -y git)"
       - wsl -d {{.WSL_DISTRO}} bash -c "if [ ! -d ~/dotfiles ]; then git clone {{.REPO_URL}} ~/dotfiles; else cd ~/dotfiles && git pull; fi"
-      - wsl -d {{.WSL_DISTRO}} bash ~/dotfiles/scripts/bootstrap.sh
+      - wsl -d {{.WSL_DISTRO}} bash -c "chmod +x ~/dotfiles/scripts/bootstrap.sh"

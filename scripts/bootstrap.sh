@@ -3,14 +3,20 @@ set -e # Exit on error
 
 echo ">>> Starting System Bootstrap..."
 
-# 1. Install Ansible
+if ! sudo -n true 2>/dev/null; then   
+    sudo -v
+    echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/$USER" > /dev/null
+    sudo chmod 0440 "/etc/sudoers.d/$USER"
+fi
+
+# Install Ansible
 if ! command -v ansible-playbook &> /dev/null; then
     echo ">>> Installing Ansible..."
     sudo apt update
     sudo apt install -y ansible build-essential curl unzip
 fi
 
-# 2. Install Bitwarden CLI
+# Install Bitwarden CLI
 if ! command -v bw &> /dev/null; then
     echo ">>> Installing Bitwarden CLI..."
     curl -L "https://vault.bitwarden.com/download/?app=cli&platform=linux" -o bw.zip
@@ -20,7 +26,7 @@ if ! command -v bw &> /dev/null; then
     rm bw.zip
 fi
 
-# 3. Run
+# Run
 echo ">>> Applying Configuration..."
 cd ~/dotfiles/ansible
 sudo -v 
