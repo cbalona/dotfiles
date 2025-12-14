@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 vars:
   WSL_DISTRO: Debian
@@ -12,6 +12,7 @@ tasks:
     desc: "Full System Setup"
     cmds:
       - task: setup-windows-git
+      - task: powertoys-restore
       - task: wsl-move-drive
       - task: wsl-configure
 
@@ -19,17 +20,54 @@ tasks:
     desc: "Links Windows Git config to the dotfiles repo"
     platforms: [windows]
     vars:
-      USER_HOME: '{{.USERPROFILE}}'
+      USER_HOME: "{{.USERPROFILE}}"
       REPO_CONFIG: '{{.USER_WORKING_DIR}}\configs\gitconfig'
     cmds:
       # Remove existing .gitconfig if it's a file (backup if needed)
       - powershell -Command "if (Test-Path '{{.USER_HOME}}\.gitconfig') { Remove-Item '{{.USER_HOME}}\.gitconfig' }"
-      
+
       # Create Link
       - powershell -Command "New-Item -ItemType SymbolicLink -Path '{{.USER_HOME}}\.gitconfig' -Target '{{.REPO_CONFIG}}'"
       - powershell -Command "Set-Content -Path '{{.USER_HOME}}\.gitconfig.local' -Value '[credential]`r`n    helper = manager'"
-      
+
       - echo "Windows Git Config Linked."
+
+  powertoys-backup:
+    desc: "Backs up PowerToys settings to the dotfiles repo"
+    platforms: [windows]
+    vars:
+      POWTOYS_CONFIG_SRC: '{{.USERPROFILE}}\AppData\Local\Microsoft\PowerToys'
+      POWTOYS_CONFIG_DEST: '{{.USER_WORKING_DIR}}\configs\powertoys'
+    cmds:
+      - |
+        powershell -Command "
+          if (-not (Test-Path '{{.POWTOYS_CONFIG_DEST}}')) {
+            New-Item -ItemType Directory -Path '{{.POWTOYS_CONFIG_DEST}}' | Out-Null
+          }
+          Write-Host 'Backing up PowerToys settings...'
+          Copy-Item -Path '{{.POWTOYS_CONFIG_SRC}}\settings.json' -Destination '{{.POWTOYS_CONFIG_DEST}}' -Force
+        "
+      - echo "PowerToys backup complete."
+
+  powertoys-restore:
+    desc: "Restores PowerToys settings from the dotfiles repo"
+    platforms: [windows]
+    vars:
+      POWTOYS_CONFIG_SRC: '{{.USER_WORKING_DIR}}\configs\powertoys'
+      POWTOYS_CONFIG_DEST: '{{.USERPROFILE}}\AppData\Local\Microsoft\PowerToys'
+    cmds:
+      - |
+        powershell -NoProfile -Command "
+          if (-not (Test-Path '{{.POWTOYS_CONFIG_SRC}}')) {
+            Write-Warning 'PowerToys config not found in dotfiles. Skipping restore.'
+            exit 0
+          }
+          Write-Host 'Restoring PowerToys settings...'
+          Stop-Process -Name 'PowerToys.Runner' -ErrorAction SilentlyContinue
+          Copy-Item -Path '{{.POWTOYS_CONFIG_SRC}}\*.json' -Destination '{{.POWTOYS_CONFIG_DEST}}' -Force
+          Start-Process -FilePath 'C:\Program Files\PowerToys\PowerToys.exe'
+        "
+      - echo "PowerToys restore complete."
 
   wsl-move-drive:
     desc: "Moves WSL execution to the target drive"
