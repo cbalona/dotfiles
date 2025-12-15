@@ -91,7 +91,7 @@ tasks:
       - echo "Move Complete. Restarting WSL..."
 
   wsl-configure:
-    desc: "Bootstraps Linux and runs Ansible"
+    desc: "Bootstraps Linux"
     status:
       - wsl -d {{.WSL_DISTRO}} bash -c "if [ -d ~/dotfiles ]; then exit 0; else exit 1; fi"
     cmds:

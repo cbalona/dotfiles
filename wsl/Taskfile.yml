@@ -1,0 +1,96 @@
+version: "3"
+
+vars:
+  CONFIG_DIR: '{{.HOME}}/.config'
+  BIN_DIR: '{{.HOME}}/.local/bin'
+  SHARED_DIR: '{{.HOME}}/dotfiles/shared'
+  REPO_URL: "https://github.com/cbalona/dotfiles.git"
+  APT_PACKAGES: >-
+    bat
+    build-essential
+    curl
+    fzf
+    git
+    htop
+    nala
+    neovim
+    ripgrep
+    unzip
+    wget
+    zsh
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+  RUST_TOOLS: >-
+    eza
+    zoxide
+    code2prompt
+
+tasks:
+  default:
+    desc: "Full System Setup"
+    cmds:
+      - task: packages
+
+  packages:
+    desc: "Installs Apt packages and Tools"
+    platforms: [linux]
+    cmds:
+      - sudo apt update
+      - sudo apt install -y {{.APT_PACKAGES}}
+      - curl -LsSf https://astral.sh/uv/install.sh | sh
+      - curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
+    status:
+      - command -v starship
+      - command -v uv
+
+  bitwarden-cli:
+    desc: "Installs Bitwarden CLI"
+    platforms: [linux]
+    cmds:
+      - |
+        sudo unarchive \
+          --src "https://vault.bitwarden.com/download/?app=cli&platform=linux" \
+          --dest "/usr/local/bin" \
+          --remote-src \
+          --mode '0755' \
+          --creates "/usr/local/bin/bw"
+    status:
+      - command -v bw
+
+  configs:
+    desc: "Symlinks configuration files"
+    platforms: [linux]
+    cmds:
+      - mkdir -p {{.CONFIG_DIR}}
+      - ln -sf {{.ROOT_DIR}}/configs/zshrc {{.HOME}}/.zshrc
+      - ln -sf {{.ROOT_DIR}}/configs/starship.toml {{.CONFIG_DIR}}/starship.toml
+      # Git Configs
+      - ln -sf {{.SHARED_DIR}}/configs/gitconfig {{.HOME}}/.gitconfig
+      # WSL specific Git helper
+      - |
+        cat <<EOF > {{.HOME}}/.gitconfig.local
+        [credential]
+            helper = "/mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe"
+        [core]
+            filemode = true
+        EOF
+
+  shell:
+    desc: "Sets ZSH as default"
+    platforms: [linux]
+    cmds:
+      - sudo chsh -s $(which zsh) {{.USER}}
+    status:
+      - test "$SHELL" = "$(which zsh)"
+
+  rust-tools:
+    desc: "Installs Rust based tools"
+    platforms: [linux]
+    cmds:
+      - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      - source {{.HOME}}/.cargo/env
+      - cargo install --locked {{.RUST_TOOLS}}
+    status:
+      - command -v eza
+      - command -v zoxide
+      - command -v code2prompt
