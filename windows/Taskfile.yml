@@ -5,6 +5,7 @@ vars:
   WSL_USER: cb
   WSL_DRIVE_PATH: "E:/wsl"
   BACKUP_PATH: "E:/backups"
+  SHARED_DIR: '{{.HOME}}/dev/dotfiles/shared'
   REPO_URL: "https://github.com/cbalona/dotfiles.git"
 
 tasks:
@@ -68,6 +69,24 @@ tasks:
           Start-Process -FilePath 'C:\Program Files\PowerToys\PowerToys.exe'
         "
       - echo "PowerToys restore complete."
+
+  configs:
+    desc: "Symlinks configuration files"
+    platforms: [windows]
+    vars:
+      USER_HOME: "{{.USERPROFILE}}"
+      REPO_DIR: "{{.USER_WORKING_DIR}}"
+    cmds:
+      # Glaze WM Config
+      - powershell -Command "if (Test-Path '{{.USER_HOME}}\.glaze-wm') { Remove-Item '{{.USER_HOME}}\.glaze-wm' }"
+      - powershell -Command "New-Item -ItemType SymbolicLink -Path '{{.USER_HOME}}\.glaze-wm' -Target '{{.ROOT_DIR}}\configs\glaze-wm.yml'"
+      - powershell -Command "setx GLAZEWM_CONFIG_PATH '{{.USER_HOME}}\.glaze-wm'"
+      
+      # WezTerm Config
+      - powershell -Command "if (Test-Path '{{.USER_HOME}}\.wezterm.lua') { Remove-Item '{{.USER_HOME}}\.wezterm.lua' }"
+      - powershell -Command "New-Item -ItemType SymbolicLink -Path '{{.USER_HOME}}\.wezterm.lua' -Target '{{.SHARED_DIR}}\configs\wezterm.lua'"
+
+      - echo "Windows Configs Symlinked."
 
   wsl-move-drive:
     desc: "Moves WSL execution to the target drive"
