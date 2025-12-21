@@ -81,7 +81,7 @@ tasks:
       - powershell -Command "if (Test-Path '{{.USER_HOME}}\.glaze-wm') { Remove-Item '{{.USER_HOME}}\.glaze-wm' }"
       - powershell -Command "New-Item -ItemType SymbolicLink -Path '{{.USER_HOME}}\.glaze-wm' -Target '{{.ROOT_DIR}}\configs\glaze-wm.yml'"
       - powershell -Command "setx GLAZEWM_CONFIG_PATH '{{.USER_HOME}}\.glaze-wm'"
-      
+
       # WezTerm Config
       - powershell -Command "if (Test-Path '{{.USER_HOME}}\.wezterm.lua') { Remove-Item '{{.USER_HOME}}\.wezterm.lua' }"
       - powershell -Command "New-Item -ItemType SymbolicLink -Path '{{.USER_HOME}}\.wezterm.lua' -Target '{{.SHARED_DIR}}\configs\wezterm.lua'"
@@ -116,4 +116,4 @@ tasks:
     cmds:
       - wsl -d {{.WSL_DISTRO}} bash -c "command -v git >/dev/null || (sudo apt update && sudo apt install -y git)"
       - wsl -d {{.WSL_DISTRO}} bash -c "if [ ! -d ~/dotfiles ]; then git clone {{.REPO_URL}} ~/dotfiles; else cd ~/dotfiles && git pull; fi"
-      - wsl -d {{.WSL_DISTRO}} bash -c "chmod +x ~/dotfiles/scripts/bootstrap.sh"
+      - wsl -d {{.WSL_DISTRO}} bash -c "chmod +x ~/dotfiles/wsl/bootstrap.sh"
