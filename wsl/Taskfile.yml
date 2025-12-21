@@ -39,6 +39,7 @@ tasks:
       - sudo apt install -y {{.APT_PACKAGES}}
       - curl -LsSf https://astral.sh/uv/install.sh | sh
       - curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
+      - curl https://install.duckdb.org | sh
     status:
       - command -v starship
       - command -v uv

@@ -11,6 +11,9 @@
 					"PackageIdentifier": "DEVCOM.JetBrainsMonoNerdFont"
 				},
 				{
+					"PackageIdentifier": "DuckDB.cli"
+				},
+				{
 					"PackageIdentifier": "Git.Git"
 				},
                 {
